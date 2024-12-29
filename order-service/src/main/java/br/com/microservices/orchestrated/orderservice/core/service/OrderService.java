@@ -24,17 +24,26 @@ public class OrderService {
     private final JsonUtil jsonUtil;
     private final EventService eventService;
 
-//    public Order createOrder(OrderRequest orderRequest) {
-//
-//        var order = Order.builder()
-//                .orderProducts(orderRequest.getProducts())
-//                .createTime(LocalDateTime.now())
-//                .transactionId(String.format(TRANSACTION_ID_PATTERN, Instant.now().toEpochMilli(), UUID.randomUUID()))
-//                .build();
-//
-//    }
-//
-//    private Event createPayload(Order order){
-//
-//    }
+    public Order createOrder(OrderRequest orderRequest) {
+        var order = Order.builder()
+                .orderProducts(orderRequest.getProducts())
+                .createTime(LocalDateTime.now())
+                .transactionId(String.format(TRANSACTION_ID_PATTERN, Instant.now().toEpochMilli(), UUID.randomUUID()))
+                .build();
+
+        this.repository.save(order);
+        this.producer.sendEvent(this.jsonUtil.toJson(this.createPayload(order)));
+        return order;
+
+    }
+    private Event createPayload(Order order){
+        var event = Event.builder()
+                .orderId(order.getId())
+                .transactionId(order.getTransactionId())
+                .payload(order)
+                .createTime(LocalDateTime.now())
+                .build();
+        this.eventService.save(event);
+        return event;
+    }
 }

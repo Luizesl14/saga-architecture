@@ -1,8 +1,5 @@
 package br.com.microservices.orchestrated.inventoryservice.core.consumer;
 
-
-
-
 import br.com.microservices.orchestrated.inventoryservice.core.service.InventoryService;
 import br.com.microservices.orchestrated.inventoryservice.core.utils.JsonUtil;
 import lombok.AllArgsConstructor;
@@ -26,8 +23,6 @@ public class InventoryServiceConsumer {
         log.info("Receiving success event {} from inventory-success topic", payload);
         var event = this.jsonUtil.toEvent(payload);
         this.inventoryService.updateInventory(event);
-
-
     }
 
     @KafkaListener(
@@ -39,5 +34,4 @@ public class InventoryServiceConsumer {
         var event = this.jsonUtil.toEvent(payload);
         this.inventoryService.rollbackInventory(event);
     }
-
 }
